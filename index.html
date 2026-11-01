@@ -1,0 +1,853 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tool CTEPH">
+<meta name="theme-color" content="#FAF9F7">
+<script data-iphone="sentinella">
+(function(){
+var h=document.documentElement, msg="";
+function ha(c){ return (" "+h.className+" ").indexOf(" "+c+" ")>=0; }
+// L'errore puo' arrivare prima che l'avviso esista — uno script in <head> che
+// non si lascia leggere —: il messaggio si tiene da parte e si scrive quando
+// la pagina c'e'.
+function scrivi(){
+  var e=document.getElementById("nmerr");
+  if(e&&msg) e.textContent="Errore del motore: "+msg;
+}
+function ko(m){
+  if(m&&!msg) msg=m;
+  if(!ha("motore-ko")) h.className+=" motore-ko";
+  scrivi();
+}
+h.className+=" js";
+window.onerror=function(m,src,riga,col){
+  m=String(m);
+  if(/^Script error\.?$/.test(m)) m="il browser non ne mostra il dettaglio (\u00abScript error.\u00bb)";
+  ko(m+(riga?" (riga "+riga+(col?", colonna "+col:"")+")":""));
+};
+document.addEventListener("DOMContentLoaded",function(){
+  if(!ha("motore-ok")) ko(msg||"il motore non ha completato l'avvio"); else scrivi();
+});
+})();
+</script>
+<title>CTEPH e CTEPD — dalla conferma alla terapia e al follow-up</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+  :root {
+    --bg:#FAF9F7; --surface:#FFFFFF; --surface-alt:#F3F2EF;
+    --border:rgba(11,11,11,0.10); --border-strong:rgba(11,11,11,0.18);
+    --text-primary:#0B0B0B; --text-secondary:#52514E; --text-muted:#76746F;
+    --accent-blue:#2A78D6;   --accent-blue-bg:#E6F1FB;   --accent-blue-border:#B5D4F4;
+    --accent-amber:#BA7517;  --accent-amber-bg:#FAEEDA;  --accent-amber-border:#FAC775;
+    --accent-red:#A32D2D;    --accent-red-bg:#FCEBEB;    --accent-red-border:#F7C1C1;
+    --accent-green:#3B6D11;  --accent-green-bg:#EAF3DE;  --accent-green-border:#C0DD97;
+    --cor-1:#3B8E5A; --cor-2a:#E0A82E; --cor-2b:#DE7E3C; --cor-3:#B33A3A;
+    --k0:#2E7D4F; --k0-bg:#E2F3E8; --k0-bd:#A6D9B8;
+    --k1:#2A78D6; --k1-bg:#E3EFFB; --k1-bd:#A9CBF1;
+    --k2:#8A6A00; --k2-bg:#FBF3C8; --k2-bd:#EBD56C;
+    --k3:#B45309; --k3-bg:#FDEBD8; --k3-bd:#F4BD85;
+    --k4:#A32D2D; --k4-bg:#FCE3E3; --k4-bd:#F0A9A9;
+    --grid:rgba(42,120,214,.08);
+    --font:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --display:'IBM Plex Sans Condensed','Arial Narrow',-apple-system,'Segoe UI',sans-serif;
+    --mono:'IBM Plex Mono',ui-monospace,Consolas,'Courier New',monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#111418; --surface:#181C22; --surface-alt:#20252D;
+      --border:rgba(255,255,255,.10); --border-strong:rgba(255,255,255,.19);
+      --text-primary:#E7EAEE; --text-secondary:#B8BEC7; --text-muted:#949BA5;
+      --accent-blue:#72AAEE;   --accent-blue-bg:#18283A;   --accent-blue-border:#2E4B6C;
+      --accent-amber:#E3A94F;  --accent-amber-bg:#30250F;  --accent-amber-border:#5D4719;
+      --accent-red:#EF8E8E;    --accent-red-bg:#361B1B;    --accent-red-border:#6B3232;
+      --accent-green:#95C873;  --accent-green-bg:#1C2A13;  --accent-green-border:#3C5626;
+      --k0:#8FD3A8; --k0-bg:#132B1D; --k0-bd:#2D5A3E;
+      --k1:#8EC0F5; --k1-bg:#16283C; --k1-bd:#2F5378;
+      --k2:#EDD36A; --k2-bg:#2C260C; --k2-bd:#5E5120;
+      --k3:#F3B27A; --k3-bg:#33210F; --k3-bd:#6B4524;
+      --k4:#F29A9A; --k4-bg:#361B1B; --k4-bd:#6B3232;
+      --grid:rgba(114,170,238,.07);
+      color-scheme:dark;
+    }
+  }
+  body { font-family:var(--font); background:var(--bg); color:var(--text-primary); font-size:14.5px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+  .page { max-width:960px; margin:0 auto; padding:0 16px 4rem; }
+  strong, b { font-weight:600; }
+  em { font-style:italic; }
+  .muted { color:var(--text-muted); }
+  .hero { margin:0 -16px 0; padding:2.2rem 16px 1.3rem; border-bottom:1px solid var(--border);
+          background-color:var(--bg);
+          background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+          background-size:22px 22px; }
+  .kicker { font-family:var(--mono); font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--accent-blue); margin-bottom:8px; }
+  .headline { font-family:var(--display); font-size:30px; font-weight:700; line-height:1.12; margin-bottom:10px; }
+  .lede { font-size:14.5px; color:var(--text-secondary); max-width:760px; margin-bottom:12px; }
+  .lede strong { color:var(--text-primary); }
+  .meta-row { display:flex; flex-wrap:wrap; gap:6px 8px; font-size:12px; }
+  .meta-chip { background:var(--surface); border:1px solid var(--border-strong); border-radius:99px; padding:2px 10px; color:var(--text-secondary); overflow-wrap:anywhere; }
+  .meta-chip strong { color:var(--text-primary); }
+  .bar { position:-webkit-sticky;position:sticky; top:0; z-index:30; background:var(--bg); border-bottom:1px solid var(--border-strong);
+         margin:0 -16px 1.2rem; padding:8px 16px; display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; }
+  .bar .lbl { font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); }
+  .bar .sp { flex:1 1 auto; }
+  .btn { font:600 12.5px var(--font); padding:6px 13px; border-radius:99px; border:1px solid var(--border-strong); background:var(--surface); color:var(--text-secondary); cursor:pointer; }
+  .btn:hover { border-color:var(--accent-blue); color:var(--accent-blue); }
+  .stage { display:flex; align-items:baseline; gap:10px; margin:2rem 0 .7rem; padding-bottom:6px; border-bottom:2px solid var(--border-strong); }
+  .stage-n { font-family:var(--mono); font-size:12px; font-weight:600; color:#FFFFFF; background:var(--accent-blue); border-radius:6px; padding:1px 7px; }
+  .stage-t { font-family:var(--display); font-size:20px; font-weight:700; line-height:1.2; }
+  .stage-w { margin-left:auto; font-size:11.5px; color:var(--text-muted); text-align:right; }
+  .card { background:var(--surface); border:1px solid var(--border-strong); border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+  .card h3 { font-size:13px; font-weight:600; letter-spacing:.02em; margin-bottom:8px; color:var(--text-secondary); }
+  .card h3.sep { margin-top:12px; padding-top:10px; border-top:1px solid var(--border-strong); }
+  .fl { font-size:12.5px; font-weight:600; color:var(--text-secondary); min-width:150px; }
+  .fl small { display:block; font-weight:400; color:var(--text-muted); font-size:11.5px; }
+  input[type=number] { font:500 15px var(--font); color:var(--text-primary); background:var(--surface); border:1px solid var(--border-strong); border-radius:8px; padding:6px 9px; width:92px; text-align:center; }
+  .seg { display:inline-flex; flex-wrap:wrap; border:1px solid var(--border-strong); border-radius:10px; overflow:hidden; max-width:100%; }
+  .seg label { position:relative; cursor:pointer; }
+  .seg input { position:absolute; opacity:0; width:1px; height:1px; }
+  .seg span { display:block; padding:6px 12px; font-size:13.5px; font-weight:500; color:var(--text-secondary); border-right:1px solid var(--border); }
+  .seg label:last-child span { border-right:none; }
+  .seg input:checked + span { background:var(--text-primary); color:var(--bg); }
+  .seg input:focus-visible + span { outline:2px solid var(--accent-blue); outline-offset:-2px; }
+  .seg.col { display:flex; flex-direction:column; }
+  .seg.col span { border-right:none; border-bottom:1px solid var(--border); }
+  .seg.col label:last-child span { border-bottom:none; }
+  .seg.col small { display:block; font-weight:400; font-size:11.5px; opacity:.8; }
+  .chk { display:flex; align-items:flex-start; gap:9px; padding:6px 0; font-size:14px; line-height:1.45; border-bottom:1px dashed var(--border); cursor:pointer; }
+  .chk:last-child { border-bottom:none; }
+  .chk input { margin-top:3px; width:17px; height:17px; flex:0 0 auto; accent-color:var(--accent-blue); }
+  .chk small { display:block; color:var(--text-muted); font-size:12px; }
+  .chk .tx { flex:1 1 auto; min-width:0; }
+  .chk.on .tx { color:var(--text-primary); font-weight:500; }
+  .chk.conf { margin-top:6px; border-top:1px solid var(--border-strong); padding-top:9px; }
+  .peso { font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+  .peso .ne { color:var(--accent-amber); font-weight:600; }
+  .grp { font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin:10px 0 2px; }
+  .grp:first-child { margin-top:0; }
+  .riga { display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; padding:6px 0; border-bottom:1px dashed var(--border); }
+  .riga:last-child { border-bottom:none; }
+  .riga .fl { min-width:0; flex:1 1 180px; }
+  .hide { display:none !important; }
+  .esito { display:flex; flex-wrap:wrap; align-items:center; gap:10px 14px; margin-bottom:4px; }
+  .cat { display:inline-block; font-size:12.5px; font-weight:600; border-radius:99px; padding:2px 10px; border:1px solid; }
+  .k0 { color:var(--k0); background:var(--k0-bg); border-color:var(--k0-bd); }
+  .k1 { color:var(--k1); background:var(--k1-bg); border-color:var(--k1-bd); }
+  .k2 { color:var(--k2); background:var(--k2-bg); border-color:var(--k2-bd); }
+  .k3 { color:var(--k3); background:var(--k3-bg); border-color:var(--k3-bd); }
+  .k4 { color:var(--k4); background:var(--k4-bg); border-color:var(--k4-bd); }
+  .kx { color:var(--text-muted); background:var(--surface-alt); border-color:var(--border-strong); }
+  .big { font-family:var(--display); font-size:24px; font-weight:700; line-height:1.15; }
+  .cor { display:inline-block; font-family:var(--mono); font-size:11px; font-weight:600; color:#FFFFFF; border-radius:4px; padding:0 5px; margin:0 1px; white-space:nowrap; vertical-align:1px; }
+  .c1 { background:var(--cor-1); } .c2a { background:var(--cor-2a); color:#1D1602; } .c2b { background:var(--cor-2b); } .c3 { background:var(--cor-3); }
+  .cf { background:var(--surface-alt); color:var(--text-secondary); border:1px dashed var(--border-strong); }
+  .pg { font-family:var(--mono); font-size:11px; color:var(--text-muted); }
+  .nota { border-left:3px solid var(--accent-amber); background:var(--accent-amber-bg); border-radius:0 8px 8px 0; padding:7px 11px; margin-top:8px; font-size:13.5px; }
+  .nota.info { border-left-color:var(--accent-blue); background:var(--accent-blue-bg); }
+  .nota.stop { border-left-color:var(--accent-red); background:var(--accent-red-bg); }
+  .nota.ok { border-left-color:var(--accent-green); background:var(--accent-green-bg); }
+  .nota.spenta { border-left-color:var(--border-strong); background:var(--surface-alt); color:var(--text-secondary); }
+  .nota strong { color:var(--text-primary); }
+  .ed { border:1px solid var(--border-strong); border-radius:10px; padding:10px 12px; margin-top:10px; }
+  .ed.prev { border-color:var(--accent-blue-border); background:var(--accent-blue-bg); }
+  .ed .edt { font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; }
+  .ed.prev .edt { color:var(--accent-blue); }
+  .ed .tx { font-size:13.5px; overflow-wrap:anywhere; }
+  .conta { font-size:13.5px; margin-top:6px; }
+  .conta li { margin:2px 0 2px 18px; }
+  .passo { display:flex; gap:10px; padding:8px 0; border-bottom:1px dashed var(--border); }
+  .passo:last-child { border-bottom:none; }
+  .passo .ico { flex:0 0 26px; font-weight:700; text-align:center; font-family:var(--mono); font-size:13px; padding-top:1px; }
+  .passo .tx { flex:1 1 auto; font-size:14px; min-width:0; overflow-wrap:anywhere; }
+  .passo.att { background:var(--accent-blue-bg); border-radius:8px; border-bottom-color:transparent; padding:8px 8px; margin:2px -8px; }
+  .passo.att .ico { color:var(--accent-blue); }
+  .lista li { margin:4px 0 4px 18px; font-size:13.5px; }
+  .vv { font-family:var(--mono); font-size:12px; color:var(--text-muted); }
+  .foot { margin-top:2.4rem; padding-top:1rem; border-top:1px solid var(--border-strong); font-size:12px; color:var(--text-muted); line-height:1.7; }
+  .foot strong { color:var(--text-secondary); }
+  .tab { width:100%; border-collapse:collapse; font-size:13px; margin-top:4px; }
+  .tab th, .tab td { text-align:left; padding:5px 6px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .tab th { font-size:11.5px; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; white-space:nowrap; overflow-wrap:normal; }
+  .tab td.n { font-family:var(--mono); white-space:nowrap; text-align:right; }
+  .tab tr.on td { background:var(--accent-blue-bg); font-weight:600; }
+
+  .passo.off .tx, .passo.off .ico { color:var(--text-muted); }
+  .passo.off .cor { opacity:.55; }
+  .passo.stp { background:var(--accent-red-bg); border-radius:8px; border-bottom-color:transparent; padding:8px 8px; margin:2px -8px; }
+  .passo.stp .ico { color:var(--accent-red); }
+  .gr { display:inline-block; font-family:var(--mono); font-size:10.5px; color:var(--text-secondary); background:var(--surface-alt); border:1px dashed var(--border-strong); border-radius:4px; padding:0 5px; white-space:normal; vertical-align:1px; }
+  .sot { font-family:var(--mono); font-size:10.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted); margin:12px 0 2px; }
+  .sot:first-child { margin-top:0; }
+  .mai { font-size:11.5px; font-weight:600; color:var(--accent-red); }
+  @media (max-width:640px) {
+    .page { overflow-wrap:anywhere; }
+    .headline { font-size:25px; }
+    .stage-w { display:none; }
+    .fl { min-width:0; width:100%; }
+    .big { font-size:21px; }
+  }
+  @media print { .bar { position:static; } }
+</style>
+<style data-iphone="stile">
+/* L'avviso e' visibile per costruzione: lo nasconde solo la classe che la
+   sentinella mette quando JavaScript esiste, e lo rimostra quando il motore
+   muore. Nell'anteprima dell'iPhone nessuna delle due arriva. */
+#nomotore{background:#FCEBEB;border:1.5px solid #A32D2D;border-radius:10px;
+ padding:12px 15px;margin:0 0 1.1rem;font-size:13.5px;line-height:1.6;color:#0B0B0B;
+ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+#nomotore strong{display:block;color:#A32D2D;font-size:15px;margin-bottom:4px}
+#nomotore p{margin:6px 0 0}
+#nomotore a{color:#A32D2D}
+#nomotore .nmurl{font-family:'SFMono-Regular',Consolas,Menlo,monospace;font-size:.92em;word-break:break-all}
+#nomotore .nmerr{display:block;font-family:'SFMono-Regular',Consolas,Menlo,monospace;
+ font-size:11.5px;color:#A32D2D;margin-top:6px;word-break:break-word}
+#nomotore .nmerr:empty{display:none}
+html.js #nomotore{display:none}
+html.js.motore-ko #nomotore{display:block}
+
+#nmprivacy{background:#E2F4F5;border:1px solid #A7DBDE;border-radius:8px;padding:9px 13px;
+ margin:0 0 1rem;font-size:12.5px;line-height:1.55;color:#0B0B0B;
+ font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif}
+@media print{#nmprivacy{display:none}}
+</style>
+</head>
+<body>
+<div class="nomotore" id="nomotore" role="alert">
+ <strong>Motore di calcolo non attivo</strong>
+ <p>I calcoli, i filtri e i comandi di questa pagina <b>non funzionano</b>: dove leggi «—» non c'è un
+ valore. Il testo resta leggibile, i numeri che dipendono dai tuoi dati no. Non usare questa pagina
+ per decidere una dose.</p>
+ <p>Su iPhone e iPad succede sempre con un file salvato sul telefono: si apre nell'<b>anteprima</b> —
+ dall'app File, da Mail, da WhatsApp —, che mostra la pagina ma non esegue il motore, e Apple non
+ permette di aprirlo in Safari. Sull'iPhone il tool funziona aperto da questo indirizzo, in Safari: <a class="nmurl" href="https://francescofugetto-ai.github.io/tool-cteph-web/">https://francescofugetto-ai.github.io/tool-cteph-web/</a> — poi Condividi, «Aggiungi alla schermata Home». Dopo la prima apertura funziona anche senza rete. Su computer e Android basta aprire il file.</p>
+ <span class="nmerr" id="nmerr"></span>
+</div>
+<div class="nmprivacy" id="nmprivacy">
+ <b>Quello che scrivi resta su questo dispositivo.</b> La pagina non invia niente in rete e non
+ salva niente: nessun dato esce da qui. Per la stessa ragione, <b>chiudendola il contenuto si
+ perde</b> — copia il referto dove ti serve prima di chiudere.
+</div>
+<div class="page">
+<header class="hero">
+  <div class="kicker">Strumento · Ipertensione polmonare · gruppo 4 · ESC/ERS 2022</div>
+  <h1 class="headline">CTEPH e CTEPD — dalla conferma alla terapia e al follow-up</h1>
+  <p class="lede"><strong>Come si usa.</strong> Comincia dove finisce il <strong>Tool EP CTEPD</strong>, che porta il paziente con dispnea dopo un'embolia fino all'invio al centro. Si dice da dove si parte, si scrivono i numeri del cateterismo, e lo strumento mette in fila le righe della <strong>Rec. Table 24A e 24B</strong> con la loro classe e il percorso delle <strong>Fig. 13, 14 e 15</strong>, dicendo quali valgono per questo paziente e quali no. <strong>L'operabilità la decide il team CTEPH: lo strumento non la calcola</strong>, e la riceve come risposta. <strong>Nessuna dose</strong>: l'anticoagulante sta nel <strong>Tool EP durata</strong>, riociguat e treprostinil, con rene e fegato, nel <strong>Tool Farmaci PAH</strong>. <strong>Azzera</strong>, in alto, ricomincia.</p>
+  <div class="meta-row">
+    <span class="meta-chip"><strong>Fonte</strong> 2022 ESC/ERS Guidelines for the diagnosis and treatment of pulmonary hypertension · § 10, pp. 3694–3699</span>
+    <span class="meta-chip"><strong>Calcolo</strong> Tab. 5 p. 3637 · Fig. 13 p. 3694 · Fig. 14 p. 3696 · Fig. 15 p. 3697 · Rec. Table 24A p. 3698 · 24B p. 3699</span>
+    <span class="meta-chip"><strong>Accanto</strong> AHA/ACC 2026 EP pp. e1025–e1029 · ESC 2019 EP · studi dopo il 2022, senza cambiare una classe</span>
+  </div>
+</header>
+
+<div class="bar" id="bar" aria-live="polite">
+  <span class="lbl">Quadro</span> <span id="barQuadro" class="cat kx">—</span>
+  <span class="lbl">Passo</span> <span id="barPasso" class="cat kx">—</span>
+  <span class="lbl">Cateterismo</span> <span id="barRhc" class="cat kx">—</span>
+  <span class="sp"></span>
+  <button class="btn" id="azzera" type="button">Azzera</button>
+</div>
+
+<div class="stage"><span class="stage-n">1</span><span class="stage-t">Da dove si parte</span><span class="stage-w">Fig. 13, p. 3694 · Tab. 5, p. 3637</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Diagnosi<small>la CTEPH è la CTEPD con l'ipertensione polmonare a riposo; a separarle è il cateterismo</small></span>
+    <span class="seg col">
+      <label><input type="radio" name="diag" value="dac"><span>da completare<small>arriva al centro: esami ancora in corso</small></span></label>
+      <label><input type="radio" name="diag" value="cteph"><span>CTEPH confermata<small>trombo cronico, e IP a riposo al cateterismo</small></span></label>
+      <label><input type="radio" name="diag" value="ctepd"><span>CTEPD senza IP<small>trombo cronico e sintomi, nessuna IP a riposo</small></span></label>
+    </span></div>
+  <div id="bloccoDac" class="hide">
+    <div class="sot">La valutazione completa</div>
+    <div class="riga"><span class="fl">Almeno 3 mesi di anticoagulante a dose terapeutica?<small>Fig. 13, nota d, p. 3694</small></span>
+      <span class="seg">
+        <label><input type="radio" name="mesi3" value="si"><span>sì</span></label>
+        <label><input type="radio" name="mesi3" value="no"><span>no</span></label>
+      </span></div>
+    <label class="chk"><input type="checkbox" id="instabile"><span class="tx">Instabile, o peggiora in fretta<small>l'eccezione ai 3 mesi per la valutazione completa, nota d</small></span></label>
+    <label class="chk"><input type="checkbox" id="perf"><span class="tx">Difetti di perfusione non concordanti alla V/Q</span></label>
+    <label class="chk"><input type="checkbox" id="trombo"><span class="tx">Segni di trombo cronico all'angio-TC o alla DSA<small>stenosi ad anello, membrane e fessure, occlusioni totali croniche</small></span></label>
+  </div>
+  <div class="sot">Il cateterismo destro più recente</div>
+  <div class="riga"><span class="fl">mPAP<small>mmHg · a riposo</small></span><input type="number" id="mpap" min="1" max="150" step="any" inputmode="decimal" placeholder="mmHg"><span class="vv" id="vMpap">—</span></div>
+  <div class="riga"><span class="fl">PAWP<small>mmHg</small></span><input type="number" id="pawp" min="1" max="60" step="any" inputmode="decimal" placeholder="mmHg"><span class="vv" id="vPawp">—</span></div>
+  <div class="riga"><span class="fl">PVR<small>WU · il calcolo dai numeri è nel Tool Cateterismo IP</small></span><input type="number" id="pvr" min="0.1" max="40" step="any" inputmode="decimal" placeholder="WU"><span class="vv" id="vPvr">—</span></div>
+  <div id="outEmo"></div>
+</div>
+
+<div id="stAc" class="hide">
+<div class="stage"><span class="stage-n">2</span><span class="stage-t">L'anticoagulante</span><span class="stage-w">Rec. Table 24A, p. 3698 · p. 3695 · nota c, p. 3699</span></div>
+<div class="card">
+  <div id="bloccoAcCteph" class="hide">
+    <div class="riga"><span class="fl">Sindrome da antifosfolipidi</span>
+      <span class="seg">
+        <label><input type="radio" name="aps" value="nd"><span>non cercata</span></label>
+        <label><input type="radio" name="aps" value="neg"><span>esclusa</span></label>
+        <label><input type="radio" name="aps" value="pos"><span>presente</span></label>
+      </span></div>
+    <div class="riga"><span class="fl">Anticoagulante in corso</span>
+      <span class="seg">
+        <label><input type="radio" name="oac" value="avk"><span>AVK</span></label>
+        <label><input type="radio" name="oac" value="noac"><span>NOAC</span></label>
+        <label><input type="radio" name="oac" value="no"><span>nessuno</span></label>
+      </span></div>
+    <label class="chk"><input type="checkbox" id="metaDose"><span class="tx">Prende la dose ridotta della fase estesa dopo l'EP</span></label>
+  </div>
+  <div id="bloccoAcCtepd" class="hide">
+    <div class="riga"><span class="fl">Rischio di recidiva di EP<small>nota c, p. 3699, con la ESC 2019 sull'EP (p. 3695)</small></span>
+      <span class="seg">
+        <label><input type="radio" name="ricad" value="basso"><span>basso</span></label>
+        <label><input type="radio" name="ricad" value="ia"><span>intermedio o alto</span></label>
+      </span></div>
+    <div class="riga"><span class="fl">Storia di tromboembolismo venoso</span>
+      <span class="seg">
+        <label><input type="radio" name="tev" value="si"><span>sì</span></label>
+        <label><input type="radio" name="tev" value="no"><span>no</span></label>
+      </span></div>
+  </div>
+</div>
+</div>
+
+<div id="stInt" class="hide">
+<div class="stage"><span class="stage-n">3</span><span class="stage-t">Il team e le lesioni</span><span class="stage-w">Fig. 14, p. 3696 · Fig. 15, p. 3697</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Intervento già fatto</span>
+    <span class="seg">
+      <label><input type="radio" name="int" value="no"><span>nessuno</span></label>
+      <label><input type="radio" name="int" value="pea"><span>PEA, con o senza BPA</span></label>
+      <label><input type="radio" name="int" value="bpa"><span>solo BPA</span></label>
+    </span></div>
+  <div id="bloccoOper" class="hide">
+    <div class="riga"><span class="fl">Operabile, per il team CTEPH<small>esperienza del team, accessibilità delle lesioni, proporzione fra IP e ostruzione, comorbidità (p. 3695)</small></span>
+      <span class="seg">
+        <label><input type="radio" name="oper" value="si"><span>sì</span></label>
+        <label><input type="radio" name="oper" value="no"><span>no</span></label>
+        <label><input type="radio" name="oper" value="nd"><span>non ancora deciso</span></label>
+      </span></div>
+    <label class="chk"><input type="checkbox" id="distSfav"><span class="tx">Operabile, ma malattia in gran parte distale e rapporto rischio:beneficio della PEA sfavorevole</span></label>
+    <label class="chk"><input type="checkbox" id="misto"><span class="tx">Lesioni miste: accessibili in un polmone, inoperabili nell'altro</span></label>
+  </div>
+  <div id="bloccoDopo" class="hide">
+    <div class="riga"><span class="fl">Mesi dall'intervento<small>dalla PEA o dall'ultima BPA</small></span><input type="number" id="mesi" min="0" max="600" step="any" inputmode="decimal" placeholder="mesi"><span class="vv" id="vMesi">—</span></div>
+    <div class="riga"><span class="fl">Il controllo dopo l'intervento</span>
+      <span class="seg col">
+        <label><input type="radio" name="esito" value="nd"><span>non ancora fatto</span></label>
+        <label><input type="radio" name="esito" value="pers"><span>IP persistente o recidivante</span></label>
+        <label><input type="radio" name="esito" value="ok"><span>nessuna IP</span></label>
+      </span></div>
+  </div>
+  <div class="sot">Dove sono le lesioni · Fig. 15 · sul referto del centro</div>
+  <label class="chk"><input type="checkbox" id="livA"><span class="tx">A · prossimali<small>vasi di 10–40 mm</small></span></label>
+  <label class="chk"><input type="checkbox" id="livB"><span class="tx">B · segmentarie e subsegmentarie<small>vasi di 2–10 mm</small></span></label>
+  <label class="chk"><input type="checkbox" id="livC"><span class="tx">C · subsegmentarie, a membrana<small>vasi di 0,5–5 mm</small></span></label>
+  <label class="chk"><input type="checkbox" id="livD"><span class="tx">D · subsegmentarie a rete, forse con microvasculopatia<small>vasi sotto 0,5 mm</small></span></label>
+  <label class="chk"><input type="checkbox" id="livE"><span class="tx">E · microvasculopatia<small>vasi sotto 0,05 mm</small></span></label>
+</div>
+</div>
+
+<div id="stPaz" class="hide">
+<div class="stage"><span class="stage-n" id="nPaz">4</span><span class="stage-t">Il paziente oggi</span><span class="stage-w">Rec. Table 24A, p. 3698 · p. 3667</span></div>
+<div class="card">
+  <div class="riga"><span class="fl">Sintomi attribuibili alla malattia</span>
+    <span class="seg">
+      <label><input type="radio" name="sint" value="si"><span>sì</span></label>
+      <label><input type="radio" name="sint" value="no"><span>no</span></label>
+    </span></div>
+  <div class="riga" id="rigaWho"><span class="fl">Classe funzionale WHO</span>
+    <span class="seg">
+      <label><input type="radio" name="who" value="1"><span>I</span></label>
+      <label><input type="radio" name="who" value="2"><span>II</span></label>
+      <label><input type="radio" name="who" value="3"><span>III</span></label>
+      <label><input type="radio" name="who" value="4"><span>IV</span></label>
+    </span></div>
+  <div id="bloccoFarm">
+    <div class="sot">In corso o da aggiungere</div>
+    <label class="chk"><input type="checkbox" id="rio"><span class="tx">Riociguat</span></label>
+    <label class="chk"><input type="checkbox" id="pde5"><span class="tx">Inibitore della PDE5</span></label>
+    <label class="chk"><input type="checkbox" id="nitr"><span class="tx">Nitrati o donatori di ossido nitrico</span></label>
+  </div>
+</div>
+</div>
+
+<div class="stage"><span class="stage-n">→</span><span class="stage-t">Il percorso</span><span class="stage-w">Rec. Table 24A e 24B · Fig. 14</span></div>
+<div class="card" id="outPiano"></div>
+
+<div id="stLiv" class="hide">
+<div class="card" id="outLiv"></div>
+</div>
+
+<div class="card"><h3>Da sapere: incoerenze della fonte, altre linee guida, studi dopo il 2022</h3><div id="outInc"></div></div>
+<div class="card"><h3>Limiti per questo paziente</h3><ul class="lista" id="limiti"></ul></div>
+
+<div class="foot">
+  <strong>Fonti.</strong> Humbert M, Kovacs G, Hoeper MM, et al. 2022 ESC/ERS Guidelines for the diagnosis and treatment of pulmonary hypertension. <em>Eur Heart J</em> 2022;43:3618–3731 — Tab. 5 (p. 3637), Rec. Table 2 (p. 3652), Rec. Table 3 (p. 3654), riociguat con PDE5i e nitrati (p. 3667; Rec. Table 10, p. 3670), § 10 (pp. 3694–3698), Fig. 13, 14 e 15, Rec. Table 24A (p. 3698) e 24B (p. 3699, con la nota c). Accanto: 2026 AHA/ACC Guideline per l'embolia polmonare, pp. e1022, e1025–e1029; ESC 2019 sull'embolia polmonare. Schede tecniche per principio attivo: treprostinil per la CTEPH (EMA, testo del 31/07/2025). La serie inglese e il registro EXPERT, citati insieme a p. 3695: PMID 31557382 e PMID 35305871. Dopo il 2022, senza cambiare una classe: SELECT (Kim 2024, PMID 39326918), MACiTEPH (Jenkins 2025, PMID 41297734), THERAPY-HYBRID-BPA (Shimokawahara 2025, PMID 40714010), metanalisi di Catalani 2026 (PMID 41559250). Ogni riga porta la sua pagina.<br><br>
+  Strumento personale di studio e consultazione: <strong>non sostituisce il giudizio clinico né il team CTEPH</strong>. Non calcola l'operabilità e non dà dosi. Non salva i dati e non li invia in rete.
+</div>
+
+</div>
+<script>
+(function () {
+  "use strict";
+
+  /* ═══ DATI ═══════════════════════════════════════════════════════════════
+     Letti sulle immagini delle pagine (ESC/ERS 2022), 01/11/2026.
+     DEFINIZIONI — Tab. 5, p. 3637: IP mPAP >20; pre-capillare mPAP >20, PAWP <=15,
+       PVR >2; IpcPH mPAP >20, PAWP >15, PVR <=2; CpcPH mPAP >20, PAWP >15, PVR >2;
+       p. 3637: mPAP >20, PVR <=2 e PAWP <=15 = IP non classificata.
+     TAB. 14, p. 3652, riga del cateterismo, gruppo 4: pre- (o post-) capillare; p. 3694: CTEPH
+       resta il nome per chi ha l'IP della Tab. 5. Dunque PAWP >15 non contraddice la diagnosi.
+     CTEPD — p. 3694: sintomi, difetti non concordanti alla V/Q, segni di trombo
+       cronico all'angio-TC o alla DSA, dopo almeno 3 mesi di anticoagulante
+       terapeutico; CTEPH resta il nome con l'IP della Tab. 5.
+     VALUTAZIONE COMPLETA — Fig. 13, nota d, p. 3694: dopo 3 mesi di anticoagulante
+       terapeutico, prima nel paziente instabile o che peggiora in fretta.
+       Angio-TC, con DSA se non conclusiva, e cateterismo. Rec. Table 2, p. 3652:
+       V/Q nell'IP non spiegata I C, angio-TC nel sospetto I C, DSA IIa C. Rec.
+       Table 1, p. 3648: cateterismo per confermare I B. p. 3695: angio-TC negativa
+       non esclude.
+     RIGHE — Rec. Table 24A, p. 3698 (classe e livello sull'immagine):
+       anticoagulante a vita a dose terapeutica I C; ricerca della sindrome da
+       antifosfolipidi I C; con APS AVK I C; team CTEPH I C; PEA I B; BPA se
+       tecnicamente inoperabile o IP residua dopo PEA, con ostruzioni distali
+       adatte I B; riociguat nel sintomatico inoperabile o persistente/recidivante
+       dopo PEA I B; follow-up a lungo termine I C; multimodale IIa C; treprostinil
+       s.c. WHO-FC III-IV IIb B; farmaci della PAH fuori indicazione, sintomatico
+       inoperabile, IIb B; combinazione, inoperabile, IIb C; BPA nell'operabile con
+       molta malattia distale e rischio:beneficio sfavorevole IIb C. CTEPD senza
+       IP: anticoagulante caso per caso IIa C; PEA o BPA in sintomatici selezionati
+       IIa C. Rec. Table 24B, p. 3699: terapia medica prima della BPA IIa B, GRADE
+       qualita' molto bassa, raccomandazione condizionale. Nota c, p. 3699: a lungo
+       termine raccomandata con rischio di recidiva intermedio o alto, o senza
+       storia di TEV.
+     SOGLIE — Fig. 14, nota d, p. 3696, e testo p. 3696: PVR >4 WU farmaci prima
+       della BPA. p. 3697: mPAP >=30 associata all'avvio dei farmaci dopo la PEA;
+       mPAP >=38 e PVR >=5 sopravvivenza peggiore. p. 3698: cateterismo 3-6 mesi
+       dall'intervento; poi ogni anno eco e capacita' d'esercizio; WHO-FC I-II e/o
+       emodinamica normale o quasi, e qualita' di vita migliore. PEA >50 l'anno, BPA
+       >30 pazienti o >100 procedure l'anno.
+     FIG. 15, p. 3697 (fasce sull'immagine, diametri dalla didascalia): A prossimali
+       10-40 mm, PEA; B segmentarie e subsegmentarie 2-10 mm, PEA e BPA; C 0,5-5 mm,
+       BPA; D <0,5 mm, BPA e farmaci; E <0,05 mm, farmaci.
+     RIOCIGUAT — p. 3667: PDE5i e stimolatori della sGC mai insieme ne' con i
+       nitrati. Rec. Table 10, p. 3670: riociguat + PDE5i III B. */
+  var EMO = { mPAP:20, PAWP:15, PVR:2 };                    // Tab. 5, p. 3637
+  var PVR_BPA = 4;                                          // Fig. 14, nota d, p. 3696
+  var RHC = { da:3, a:6 };                                  // p. 3698
+  var POST = { mPAPfarm:30, mPAPpegg:38, PVRpegg:5 };       // p. 3697
+  var LIV = [                                               // Fig. 15, p. 3697
+    { id:"A", les:"prossimali", diam:"10–40 mm", fascia:"PEA", pea:1, bpa:0, farm:0 },
+    { id:"B", les:"segmentarie e subsegmentarie", diam:"2–10 mm", fascia:"PEA o BPA", pea:1, bpa:1, farm:0 },
+    { id:"C", les:"subsegmentarie, a membrana", diam:"0,5–5 mm", fascia:"BPA", pea:0, bpa:1, farm:0 },
+    { id:"D", les:"subsegmentarie a rete, forse con microvasculopatia", diam:"<0,5 mm", fascia:"BPA e farmaci", pea:0, bpa:1, farm:1 },
+    { id:"E", les:"microvasculopatia", diam:"<0,05 mm", fascia:"farmaci", pea:0, bpa:0, farm:1 }
+  ];
+  var DOM = { mpap:[1, 150], pawp:[1, 60], pvr:[0.1, 40], mesi:[0, 600] };   // limiti dello strumento, non della fonte
+
+  var R24A = "ESC/ERS 2022, Rec. Table 24A, p. 3698", R24B = "ESC/ERS 2022, Rec. Table 24B, p. 3699", NC = "nota c, p. 3699",
+      F13 = "Fig. 13, p. 3694", F13D = "Fig. 13, nota d, p. 3694", F14 = "Fig. 14, p. 3696", F14D = "Fig. 14, nota d, p. 3696", F15 = "Fig. 15, p. 3697",
+      T5 = "Tab. 5, p. 3637", T14 = "Tab. 14, p. 3652", P37 = "p. 3637", P94 = "p. 3694", P95 = "p. 3695", P96 = "p. 3696", P97 = "p. 3697", P98 = "p. 3698",
+      R2 = "Rec. Table 2, p. 3652", R1 = "Rec. Table 1, p. 3648", R3 = "Rec. Table 3, p. 3654", R10 = "Rec. Table 10, p. 3670", P67 = "p. 3667",
+      AHA = "AHA/ACC 2026", AH26 = "AHA/ACC 2026, p. e1026";
+
+  /* ═══ FUNZIONI PURE ═══════════════════════════════════════════════════ */
+  function inScala(v, k) { return v !== null && v !== undefined && !isNaN(v) && v >= DOM[k][0] && v <= DOM[k][1]; }
+
+  /* Il profilo della Tab. 5, soltanto con cio' che serve: una mPAP <=20 non chiede altro. */
+  function profilo(m, w, r) {
+    var f = [];
+    if (m !== null && !inScala(m, "mpap")) f.push("mPAP " + m + " (1–150 mmHg)");
+    if (w !== null && !inScala(w, "pawp")) f.push("PAWP " + w + " (1–60 mmHg)");
+    if (r !== null && !inScala(r, "pvr")) f.push("PVR " + r + " (0,1–40 WU)");
+    if (f.length) return { stato:"fuori", motivi:f };
+    if (m === null) return { stato:"manca", manca:"la mPAP" };
+    if (m <= EMO.mPAP) return { stato:"ok", cod:"noip", nome:"nessuna IP a riposo", k:"k0" };
+    if (w === null) return { stato:"manca", manca:"la PAWP" };
+    if (w > EMO.PAWP) {
+      if (r === null) return { stato:"ok", cod:"post", nome:"IP post-capillare", k:"k3" };
+      return r > EMO.PVR ? { stato:"ok", cod:"cpc", nome:"IP post- e pre-capillare combinata", k:"k3" } : { stato:"ok", cod:"ipc", nome:"IP post-capillare isolata", k:"k3" };
+    }
+    if (r === null) return { stato:"manca", manca:"la PVR" };
+    if (r > EMO.PVR) return { stato:"ok", cod:"pre", nome:"IP pre-capillare", k:"k1" };
+    return { stato:"ok", cod:"noncl", nome:"IP non classificata", k:"k2" };
+  }
+
+  /* Dati in contraddizione fra la diagnosi scelta e i numeri. Dopo un intervento una mPAP normale e' un risultato, non una contraddizione. */
+  function contraddizioni(s, p) {
+    var c = [];
+    /* Una mPAP >20 basta a dire IP (Tab. 5), anche con PAWP e PVR vuote; con il trombo cronico la CTEPH puo' essere pre- o post-capillare (Tab. 14, p. 3652). */
+    if (s.diag === "ctepd" && s.mpap !== null && inScala(s.mpap, "mpap") && s.mpap > EMO.mPAP) c.push("Hai scelto <b>CTEPD senza IP</b>, ma con mPAP &gt;20 mmHg c'è IP a riposo" + (p.stato === "ok" ? ": i numeri dicono <b>" + p.nome + "</b>" : ", quali che siano PAWP e PVR") + pgs(T5) + ": con il trombo cronico è una <b>CTEPH</b>, che la Tab. 14 ammette pre- o post-capillare" + pgs(T14) + ".");
+    if (p.stato !== "ok") return c;
+    if (s.diag === "cteph") {
+      if (s.int === "no" || s.int === "") {
+        if (p.cod === "noip") c.push("Hai scelto <b>CTEPH</b> e nessun intervento, ma con mPAP ≤20 mmHg non c'è IP a riposo" + pgs(T5) + ": sarebbe una <b>CTEPD senza IP</b>, e le righe sono altre. Se sono numeri sotto farmaci, scrivi quelli della diagnosi.");
+      }
+      if ((s.int === "pea" || s.int === "bpa") && s.esito === "pers" && p.cod === "noip") c.push("Hai segnato un'<b>IP persistente o recidivante</b>, ma con mPAP ≤20 mmHg non c'è IP a riposo" + pgs(T5) + ". Correggi l'uno o gli altri: riociguat e BPA stanno su quel segno.");
+    }
+    return c;
+  }
+
+  /* Non fermano il percorso: la fonte non li esclude dalla CTEPH, ma vanno chiariti. */
+  function avvisiEmo(s, p) {
+    var a = [];
+    if (p.stato !== "ok" || s.diag !== "cteph") return a;
+    if (p.cod === "ipc" || p.cod === "cpc" || p.cod === "post") a.push("<b>" + p.nome + ", con PAWP &gt;15 mmHg.</b> Non contraddice la CTEPH: la Tab. 14 scrive «pre- (o post-) capillare» per il gruppo 4" + pgs(T14) + ", e la definizione rimanda all'IP della Tab. 5" + pgs(P94) + ". Ma la componente sinistra va chiarita: Tool Gruppi 2 e 3, Tool Cateterismo IP.");
+    if (p.cod === "noncl" && (s.int === "no" || s.int === "")) a.push("<b>IP non classificata</b>: mPAP &gt;20 con PVR ≤2 WU e PAWP ≤15 mmHg" + pgs(P37) + ". La fonte non parla di questo profilo nella CTEPH, e fa pensare a un flusso polmonare alto: da chiarire col centro. Il percorso prosegue.");
+    return a;
+  }
+
+  /* La finestra del cateterismo dopo l'intervento, p. 3698. */
+  function cateterismo(s) {
+    if (s.diag !== "cteph" || s.int === "no" || s.int === "") return { stato:"na" };
+    if (s.mesi === null) return { stato:"manca" };
+    if (!inScala(s.mesi, "mesi")) return { stato:"fuori" };
+    if (s.mesi < RHC.da) return { stato:"presto" };
+    if (s.mesi <= RHC.a) return { stato:"ora" };
+    return { stato:"oltre" };
+  }
+
+  /* BPA e lesioni: la riga I B chiede ostruzioni distali adatte; la Fig. 15 dice quali. */
+  function livelli(s) { var i, o = []; for (i = 0; i < LIV.length; i++) if (s.liv[LIV[i].id]) o.push(LIV[i]); return o; }
+  function bpaDaLesioni(s) {
+    var l = livelli(s), i;
+    if (!l.length) return "cond";
+    for (i = 0; i < l.length; i++) if (l[i].bpa) return "si";
+    return "no";
+  }
+  function farmaciPrimaBpa(r) {
+    if (r === null) return "manca";
+    if (!inScala(r, "pvr")) return "fuori";
+    return r > PVR_BPA ? "sopra" : "sotto";
+  }
+  function hasPea(s) { return s.int === "pea"; }
+
+  /* Con PAWP >15 e PVR <=2 le righe di terapia (riociguat, BPA, farmaci prima della BPA, multimodale, treprostinil, fuori indicazione, combinazione) non stanno in evidenza: non nominano questo profilo.
+     Con la PVR vuota il profilo puo' essere questo, e un dato mancante non vale «normale». Con CpcPH restano, con l'avviso. */
+  function daRivedere(s) { var p = profilo(s.mpap, s.pawp, s.pvr); return p.stato === "ok" && (p.cod === "ipc" || p.cod === "post") ? p.cod : ""; }
+  function testoRivedere(c) { return c === "ipc" ? ": <b>da rivedere col team, le righe non nominano questo profilo</b> (PAWP &gt;15 mmHg, PVR ≤2 WU)." : ": <b>da rivedere col team</b>. Con PAWP &gt;15 mmHg manca la PVR, e con PVR ≤2 WU le righe non nominano questo profilo."; }
+
+  /* In che punto della Fig. 14 sta il paziente. */
+  function ramo(s) {
+    if (s.diag !== "cteph") return "";
+    if (s.int === "") return "";
+    if (hasPea(s)) {
+      if (s.esito === "pers") return "pers";
+      if (s.esito === "ok") return "segui";
+      return "attesa";
+    }
+    if (s.int === "bpa" && s.esito === "ok") return "segui";
+    if (s.oper === "si") return "pea";
+    if (s.oper === "no") return "inop";
+    return "team";
+  }
+
+  function passoCorrente(s, c) {
+    if (!s.diag) return { k:"kx", t:"—" };
+    if (c.length) return { k:"k4", t:"dati in contraddizione" };
+    if (s.diag === "ctepd") return s.mpap === null ? { k:"k2", t:"manca la mPAP" } : { k:"k1", t:"caso per caso" };
+    if (s.diag === "dac") {
+      if (s.mesi3 === "si" || s.instabile) return { k:"k1", t:"valutazione completa" };
+      if (s.mesi3 === "no") return { k:"k2", t:"attendere i 3 mesi" };
+      return { k:"kx", t:"—" };
+    }
+    var r = ramo(s);
+    if (r === "") return { k:"kx", t:"—" };
+    if (r === "pea") return { k:"k0", t:"PEA" };
+    if (r === "inop" || r === "pers") return daRivedere(s) ? { k:"k2", t:"da rivedere col team" } : { k:"k1", t:"farmaci e BPA" };
+    if (r === "segui") return { k:"k0", t:"follow-up" };
+    if (r === "attesa") return { k:"k2", t:"controllo a 3–6 mesi" };
+    return { k:"k2", t:"team CTEPH" };
+  }
+
+  /* ═══ STATO E DISEGNO ═════════════════════════════════════════════════ */
+  function el(id) { return document.getElementById(id); }
+  function ckv(id) { var e = el(id); return !!(e && e.checked); }
+  function num(id) { var v = el(id).value; if (v === "") return null; var n = parseFloat(String(v).replace(",", ".")); return isNaN(n) ? null : n; }
+  function radio(n) { var e = document.querySelector('input[name="' + n + '"]:checked'); return e ? e.value : ""; }
+  function pgs(p) { return ' <span class="pg">' + p + "</span>"; }
+  function corPill(c, l) { var k = { "I":"c1", "IIa":"c2a", "IIb":"c2b", "III":"c3" }[c]; return '<span class="cor ' + k + '">' + c + "</span>" + (l ? ' <span class="cor ' + k + '" style="opacity:.85">' + l + "</span>" : ""); }
+  function nota(g, t) { return '<div class="nota ' + (g || "") + '">' + t + "</div>"; }
+  function chip(k, t) { return '<span class="cat ' + k + '">' + t + "</span>"; }
+  function gr(t) { return ' <span class="gr">' + t + "</span>"; }
+  function sot(t) { return '<div class="sot">' + t + "</div>"; }
+  /* una riga del piano: st "si" vale per questo paziente · "no" non vale · "cond" dipende da cio' che manca · "fatto" gia' fatto · "stop" ferma */
+  function rr(st, c, l, tx, pag) {
+    var cl = st === "si" ? " att" : (st === "no" || st === "fatto" ? " off" : (st === "stop" ? " stp" : ""));
+    var ic = st === "si" ? "→" : (st === "no" ? "–" : (st === "stop" ? "■" : (st === "fatto" ? "✓" : "?")));
+    return '<div class="passo' + cl + '"><span class="ico">' + ic + '</span><span class="tx">' + (c ? corPill(c, l) + " " : "") + tx + (pag ? pgs(pag) : "") + "</span></div>";
+  }
+
+  function S() {
+    return {
+      diag:radio("diag"), mesi3:radio("mesi3"), instabile:ckv("instabile"), perf:ckv("perf"), trombo:ckv("trombo"),
+      mpap:num("mpap"), pawp:num("pawp"), pvr:num("pvr"),
+      aps:radio("aps"), oac:radio("oac"), metaDose:ckv("metaDose"), ricad:radio("ricad"), tev:radio("tev"),
+      int:radio("int"), oper:radio("oper"), distSfav:ckv("distSfav"), misto:ckv("misto"), mesi:num("mesi"), esito:radio("esito"),
+      liv:{ A:ckv("livA"), B:ckv("livB"), C:ckv("livC"), D:ckv("livD"), E:ckv("livE") },
+      sint:radio("sint"), who:radio("who"), rio:ckv("rio"), pde5:ckv("pde5"), nitr:ckv("nitr")
+    };
+  }
+
+  /* — il ramo «farmaci e BPA» della Fig. 14 — */
+  function ramoFarmaci(s, q) {
+    var h = "", inop = q === "inop", b = bpaDaLesioni(s), pr = farmaciPrimaBpa(s.pvr), l, pf = profilo(s.mpap, s.pawp, s.pvr), rv = daRivedere(s);
+    h += sot(inop ? "CTEPH inoperabile · il «no» dell'operabilità nella Fig. 14" : "IP persistente o recidivante dopo la PEA · il «sì» nella Fig. 14");
+    if (pf.stato === "ok" && (pf.cod === "ipc" || pf.cod === "cpc" || pf.cod === "post")) h += nota("", "<b>PAWP oltre 15 mmHg.</b> Le righe qui sotto sono della CTEPH, e la fonte non dice che cosa cambi con una componente post-capillare" + pgs(T14) + ". Prima si chiarisce il cuore sinistro: nell'IP da cuore sinistro i farmaci della PAH sono " + corPill("III", "A") + pgs("Rec. Table 22A, p. 3690") + ".");
+    if (!inop && s.sint === "no") h += nota("", "La Fig. 14 chiede un'IP persistente <b>sintomatica</b>" + pgs(F14) + ", e senza sintomi porta al follow-up; la riga della BPA dice «IP residua», senza sintomi" + pgs(R24A) + ". Le righe qui sotto seguono la riga di ciascuna.");
+    h += rr(s.sint === "no" ? "no" : (s.sint === "si" && !rv ? "si" : "cond"), "I", "B",
+      "<b>Riociguat</b>" + (s.sint === "no" ? ": la riga chiede un paziente sintomatico." : (rv ? testoRivedere(rv) : (s.sint === "" ? ", se è sintomatico." : "."))) + " Rene, fegato, titolazione e interazioni: <b>Tool Farmaci PAH</b>.", R24A);
+    if (b === "no") {
+      l = livelli(s);
+      h += rr("no", "I", "B", "<b>BPA</b>: la riga chiede ostruzioni distali adatte, e le lesioni segnate (" + idLiv(l) + ") stanno fuori dalla sua fascia" + pgs(F15) + ". Lettura dello strumento: la decisione resta del centro.", R24A);
+    } else {
+      h += rr(b === "si" && !rv ? "si" : "cond", "I", "B", "<b>BPA</b>" + (rv ? testoRivedere(rv) : (b === "cond" ? ", se le ostruzioni distali sono adatte: lo dice il centro (segna le lesioni al passo 3)." : ", su ostruzioni distali adatte, a tappe, in un centro ad alto volume.")), R24A);
+      if (rv) h += rr("cond", "IIa", "B", "<b>Farmaci prima della BPA</b>" + testoRivedere(rv) + gr("GRADE: qualità molto bassa · condizionale"), R24B);
+      else if (pr === "sopra") h += rr("si", "IIa", "B", "<b>Farmaci prima della BPA</b>, con PVR " + vir(s.pvr) + " WU, oltre " + PVR_BPA + " WU" + pgs(F14D) + ": nel testo vanno trattati prima, perché le complicanze scendono" + pgs(P96) + "." + gr("GRADE: qualità molto bassa · condizionale"), R24B);
+      else if (pr === "sotto") h += rr("cond", "IIa", "B", "<b>Farmaci prima della BPA</b>: con PVR " + vir(s.pvr) + " WU la soglia di " + PVR_BPA + " WU non è superata" + pgs(F14D) + ", ma la riga GRADE non mette soglie e vale per ogni candidato alla BPA; la figura ammette la BPA senza farmaci prima, sapendo che sulla prima linea i dati sono pochi." + gr("GRADE: qualità molto bassa · condizionale"), R24B);
+      else h += rr("cond", "IIa", "B", "<b>Farmaci prima della BPA</b>: — manca la PVR, che dice se si supera la soglia di " + PVR_BPA + " WU" + pgs(F14D) + "." + gr("GRADE: qualità molto bassa · condizionale"), R24B);
+    }
+    h += rr(rv ? "cond" : "si", "IIa", "C", "<b>Approccio multimodale</b>" + (rv ? testoRivedere(rv) : ": chirurgia, farmaci e angioplastica messi insieme, da considerare" + (inop ? "." : ", anche nell'IP dopo la PEA.")), R24A);
+    var w = s.who === "" ? "cond" : (s.who === "3" || s.who === "4" ? "si" : "no");
+    h += rr(w === "no" ? "no" : (rv ? "cond" : w), "IIb", "B", "<b>Treprostinil s.c.</b>" + (w === "no" ? ": la riga chiede la classe WHO III–IV." : (rv ? testoRivedere(rv) : (w === "cond" ? ", se è in classe WHO III–IV (classe non segnata)." : ", in classe WHO III–IV."))) + " Scheda tecnica per la CTEPH: classe III–IV, e sul rene nessuna raccomandazione, cautela (treprostinil per la CTEPH, EMA, testo del 31/07/2025, § 4.1, 4.2). Dose: <b>Tool Farmaci PAH</b>.", R24A);
+    if (inop) {
+      h += rr(s.sint === "no" ? "no" : (s.sint === "si" && !rv ? "si" : "cond"), "IIb", "B", "<b>Farmaci della PAH fuori indicazione</b>" + (s.sint === "no" ? ": la riga chiede un paziente sintomatico." : (rv ? testoRivedere(rv) : ", nel paziente sintomatico.")) + " PDE5i ed ERA: efficacia non dimostrata da RCT o registri" + pgs(P96) + ". Dopo il 2022, SELECT e MACiTEPH sono stati fermati per futilità (note qui sotto): <b>la classe resta</b>.", R24A);
+      h += rr(rv ? "cond" : "si", "IIb", "C", "<b>Combinazione</b>" + (rv ? testoRivedere(rv) + " Sono farmaci scelti fra" : " di farmaci scelti fra") + " stimolatore della sGC <b>o</b> PDE5i, ERA, analoghi della prostaciclina per via parenterale. La barra della riga vuol dire uno dei due: stimolatore e PDE5i mai insieme" + pgs(P67) + ". La combinazione orale PDE5i con ERA è pratica comune nella compromissione emodinamica grave" + pgs(P96) + ".", R24A);
+    } else {
+      h += rr("no", "IIb", "B", "Farmaci della PAH fuori indicazione: la riga nomina la sola CTEPH <b>inoperabile</b>, non l'IP dopo la PEA.", R24A);
+      h += rr("no", "IIb", "C", "Combinazione: anche questa riga nomina la sola CTEPH <b>inoperabile</b>.", R24A);
+      h += nota("", "<b>Non è un divieto.</b> Per l'IP dopo la PEA la tabella su questi farmaci tace, né a favore né contro. " + (rv ? "Il testo" : "Resta l'approccio multimodale, qui sopra; e il testo") + " dice la combinazione orale con PDE5i ed ERA pratica comune nella CTEPH con grave compromissione emodinamica, senza distinguere" + pgs(P96) + ". Decide il team.");
+      if (s.mpap !== null && inScala(s.mpap, "mpap") && s.mpap >= POST.mPAPfarm) h += nota("info", "Dopo la PEA una mPAP ≥" + POST.mPAPfarm + " mmHg si associa all'avvio dei farmaci" + pgs(P97) + ": è un'associazione, non una riga.");
+      if (s.mpap !== null && s.pvr !== null && inScala(s.mpap, "mpap") && inScala(s.pvr, "pvr") && s.mpap >= POST.mPAPpegg && s.pvr >= POST.PVRpegg) h += nota("", "Con mPAP ≥" + POST.mPAPpegg + " mmHg e PVR ≥" + POST.PVRpegg + " WU dopo la PEA la sopravvivenza a lungo termine è peggiore" + pgs(P97) + ".");
+    }
+    return h;
+  }
+  function idLiv(l) { var i, o = []; for (i = 0; i < l.length; i++) o.push(l[i].id); return o.join(", "); }
+  function vir(x) { return String(x).replace(".", ","); }
+
+  /* — il cateterismo dopo l'intervento — */
+  function rigaRhc(s, c) {
+    var t = "<b>Cateterismo destro a 3–6 mesi</b> dalla PEA o dall'ultima BPA, qualunque sia il risultato: serve a decidere se occorre un approccio multimodale";
+    if (c.stato === "manca") return rr("cond", "", "", t + ". — Mancano i mesi dall'intervento.", P98);
+    if (c.stato === "fuori") return rr("cond", "", "", t + ". — Mesi fuori scala (0–600).", P98);
+    if (c.stato === "presto") return rr("cond", "", "", t + ". Sono " + vir(s.mesi) + " mesi: <b>non è ancora il momento</b>.", P98);
+    var fatto = s.esito === "pers" || s.esito === "ok";
+    if (c.stato === "ora") return rr(fatto ? "fatto" : "si", "", "", t + ". Sono " + vir(s.mesi) + " mesi: <b>è il momento</b>" + (fatto ? ", e il controllo è già stato fatto." : "."), P98);
+    return rr(fatto ? "fatto" : "si", "", "", t + ". Sono " + vir(s.mesi) + " mesi: <b>la finestra è passata</b>" + (fatto ? ", e il controllo è già stato fatto." : ", e il controllo non c'è: va fatto ora."), P98);
+  }
+
+  function pianoCteph(s) {
+    var h = "", r = ramo(s), l;
+    h += sot("In ogni CTEPH");
+    h += rr(s.oac === "no" ? "stop" : "si", "I", "C", "<b>Anticoagulante a dose terapeutica, a vita</b>" + (s.oac === "no" ? ": <b>oggi non lo prende</b>." : ".") + " Le recidive e la risoluzione insufficiente del coagulo sono il cuore della malattia" + pgs(P95) + ". Molecola, dose e rene: <b>Tool EP durata</b> e prontuario del capitolo 01.", R24A);
+    if (s.metaDose) h += rr("stop", "", "", "<b>La dose ridotta non vale qui.</b> La metà dose della fase estesa è scritta per l'EP (" + AHA + ", 1 A, p. e1022); la riga della CTEPH chiede la dose terapeutica.", R24A);
+    h += rr(s.aps === "neg" || s.aps === "pos" ? "fatto" : "si", "I", "C", "<b>Ricerca della sindrome da antifosfolipidi</b>" + (s.aps === "neg" ? ": fatta, esclusa." : (s.aps === "pos" ? ": fatta, presente." : ": da fare, alla diagnosi.")) + " Riguarda circa il 10% delle CTEPH" + pgs(P95) + ".", R24A);
+    if (s.aps === "pos") h += rr(s.oac === "noac" ? "stop" : "si", "I", "C", "<b>Con la sindrome da antifosfolipidi: AVK.</b>" + (s.oac === "noac" ? " <b>Oggi prende un NOAC: non è l'anticoagulante della riga.</b>" : ""), R24A);
+    else if (s.oac === "noac") h += nota("info", "<b>NOAC senza sindrome da antifosfolipidi</b>" + (s.aps === "neg" ? "" : " (qui non ancora esclusa)") + ": nessuna riga lo vieta. Nessun RCT con nessun anticoagulante; gli AVK sono la scelta degli esperti; in una serie inglese e nel registro EXPERT sanguinamenti simili e più recidive di TEV con i NOAC" + pgs(P95) + ". " + gr("DA SAPERE") + " La recidiva di TEV è un dato della serie inglese" + pgs("PMID 31557382") + "; EXPERT riporta eventi embolici e/o trombotici, con pochi eventi e tutti i pazienti in riociguat" + pgs("PMID 35305871") + ". Dopo il 2022: note qui sotto.");
+    h += rr("si", "I", "C", "<b>Team CTEPH</b> per ogni paziente: valuta la gestione multimodale e decide l'operabilità" + pgs(P95) + ". La riunione può essere virtuale" + pgs("Fig. 14, nota b, p. 3696") + ".", R24A);
+
+    if (s.int === "") { h += nota("spenta", "— Manca l'intervento già fatto (passo 3): da lì dipende la strada della Fig. 14."); }
+    else if (r === "team") {
+      h += sot("La strada · l'operabilità non è ancora decisa");
+      h += nota("info", "<b>La decide il team</b>, non questo strumento. Dalla sua risposta la Fig. 14 si divide" + pgs(F14) + ": se operabile, PEA; se no, farmaci e BPA.");
+      h += rr("cond", "I", "B", "<b>PEA</b>, trattamento di scelta con ostruzioni fibrotiche accessibili alla chirurgia, se operabile.", R24A);
+      h += rr("cond", "I", "B", "<b>BPA</b> e <b>riociguat</b>, se tecnicamente inoperabile.", R24A);
+    }
+    else if (r === "pea") {
+      h += sot("La strada · operabile");
+      h += rr("si", "I", "B", "<b>PEA</b>, trattamento di scelta con ostruzioni fibrotiche accessibili alla chirurgia. Chi ha una malattia prossimale operabile e rifiuta va male: sopravvivenza a 5 anni 53% contro 83%" + pgs(P95) + ". Meglio un colloquio diretto con il chirurgo" + pgs(P95) + ".", R24A);
+      h += nota("", "<b>Se rifiuta la PEA:</b> nessuna riga lo copre. Le righe dei farmaci e della BPA sono scritte per l'inoperabile o per l'IP dopo la PEA" + pgs(R24A) + ": chi rifiuta non è «inoperabile», e non va segnato così. Se ne riparla col team e col chirurgo" + pgs(P95) + ".");
+      h += rr(s.distSfav ? (daRivedere(s) ? "cond" : "si") : "no", "IIb", "C", "<b>BPA nell'operabile</b>" + (s.distSfav ? (daRivedere(s) ? testoRivedere(daRivedere(s)) : ", qui: molta malattia distale e rapporto rischio:beneficio della PEA sfavorevole.") : ": solo con molta malattia distale e rapporto rischio:beneficio della PEA sfavorevole (casella al passo 3).") + " La Fig. 14 non disegna questa strada.", R24A);
+      h += nota("", "<b>Farmaci per «preparare» alla PEA:</b> pratica comune ma controversa, perché ritarda l'invio e il trattamento definitivo" + pgs(P97) + ".");
+      h += rr("cond", "", "", "Dopo la PEA: IP sintomatica persistente o recidivante → farmaci e BPA; se no → follow-up a lungo termine" + pgs(F14) + ". Quando sarà fatta, segnala «PEA» al passo 3.");
+    }
+    else if (r === "inop" || r === "pers") { h += ramoFarmaci(s, r); }
+    else if (r === "attesa") {
+      h += sot("La strada · dopo la PEA, in attesa del controllo");
+      h += nota("info", "Il bivio della Fig. 14 chiede se c'è un'IP persistente o recidivante" + pgs(F14) + ": lo dice il cateterismo qui sotto.");
+    }
+    if (s.misto && (r === "pea" || r === "inop" || r === "team")) h += nota("info", "<b>Lesioni miste</b>: può servire un approccio combinato, con la BPA prima o durante la chirurgia, per ridurre il rischio e migliorare il risultato" + pgs(P97) + ".");
+
+    if (s.int !== "" ) {
+      var c = cateterismo(s);
+      h += sot("Dopo");
+      if (c.stato !== "na") h += rigaRhc(s, c);
+      if (r === "segui") h += rr("si", "", "", "<b>Dopo un trattamento riuscito, ogni anno</b> un controllo non invasivo, eco e capacità d'esercizio, perché l'IP può tornare.", P98);
+      h += rr((s.int !== "no" || s.oper === "no") ? "si" : "cond", "I", "C", "<b>Follow-up a lungo termine</b> dopo PEA e BPA, e in chi è stabile con i farmaci, in un centro CTEPH o IP" + pgs(F14) + ".", R24A);
+      if (s.int !== "no" || s.oper === "no") h += nota("spenta", "Un bersaglio condiviso non c'è; la maggior parte degli esperti accetta WHO-FC I–II e/o un'emodinamica a riposo normale o quasi al cateterismo dei 3–6 mesi, e una qualità di vita migliore" + pgs(P98) + ". La stratificazione del rischio della PAH (Tool Rischio PAH) è validata nella CTEPH in terapia medica, ma non si sa se cambi la terapia o l'esito" + pgs(P98) + ".");
+    }
+    return h;
+  }
+
+  function pianoCtepd(s) {
+    var h = "", ac;
+    if (s.mpap === null) h += nota("stop", "— <b>Manca la mPAP.</b> «Senza IP» lo dice il cateterismo a riposo" + pgs(T5) + ": le righe qui sotto valgono solo se è ≤20 mmHg.");
+    h += sot("Prima di decidere");
+    h += rr("si", "", "", "<b>Escludere le altre cause della dispnea</b>: con il CPET limitazione ventilatoria, decondizionamento e iperventilazione psicogena; con l'eco la malattia miocardica o valvolare sinistra. Senza IP a riposo il sintomo può venire da un'IP da sforzo (Tab. 5; Tool Cateterismo IP) e/o da uno spazio morto aumentato.", P94);
+    h += sot("Le righe della CTEPD senza IP");
+    ac = (s.ricad === "ia" || s.tev === "no") ? "racc" : ((s.ricad === "basso" && s.tev === "si") ? "caso" : "manca");
+    h += rr(ac === "racc" ? "si" : "cond", "IIa", "C", "<b>Anticoagulante a lungo termine</b>, caso per caso." + (ac === "racc" ? " Qui scatta la nota c: <b>raccomandato</b>, " + (s.ricad === "ia" ? "con rischio di recidiva intermedio o alto" : "") + (s.ricad === "ia" && s.tev === "no" ? " e " : "") + (s.tev === "no" ? "senza storia di TEV" : "") + pgs(NC) + ". La classe della riga resta IIa C." : (ac === "caso" ? " Rischio basso con una storia di TEV: la nota c non scatta; nessuna prova a favore o contro, decisione individuale" + pgs(P95) + "." : " — Mancano il rischio di recidiva e/o la storia di TEV (passo 2), che fanno scattare la nota c" + pgs(NC) + ".")) + " Molecola e dose: <b>Tool EP durata</b>.", R24A);
+    h += rr(s.sint === "si" ? "si" : (s.sint === "no" ? "no" : "cond"), "IIa", "C", "<b>PEA o BPA</b> in pazienti sintomatici selezionati" + (s.sint === "no" ? ": la riga chiede i sintomi." : ", dopo un colloquio attento su rischi e benefici" + pgs(P95) + "."), R24A);
+    h += nota("", "<b>Farmaci dell'IP:</b> nessuna riga li raccomanda senza IP" + pgs(R24A) + ". La riga del team nomina la sola CTEPH; la Fig. 14 ammette PEA e BPA in questi pazienti" + pgs("Fig. 14, nota a, p. 3696") + ".");
+    h += nota("spenta", "<b>Controlli:</b> la fonte non dà un calendario per la CTEPD senza IP. Se l'IP compare, la diagnosi diventa CTEPH: cambia diagnosi al passo 1.");
+    return h;
+  }
+
+  function pianoDac(s, p) {
+    var h = "", t;
+    h += sot("Quando");
+    if (s.mesi3 === "si") t = rr("si", "", "", "<b>Valutazione completa</b>: dopo 3 mesi di anticoagulante terapeutico si può fare.", F13D);
+    else if (s.mesi3 === "no" && s.instabile) t = rr("si", "", "", "<b>Valutazione completa subito</b>: instabile o in rapido peggioramento è l'eccezione della nota d.", F13D);
+    else if (s.mesi3 === "no") t = rr("cond", "", "", "<b>Attendere i 3 mesi</b> di anticoagulante terapeutico prima della valutazione completa: la nota d anticipa solo l'instabile o chi peggiora in fretta. Se è molto sintomatico o peggiora, la valutazione dei sintomi non aspetta" + pgs("p. 3654") + ": Tool EP CTEPD.", F13D);
+    else if (s.instabile) t = rr("si", "", "", "<b>Valutazione completa subito</b>: instabile o in rapido peggioramento.", F13D);
+    else t = rr("cond", "", "", "— Manca se ci sono 3 mesi di anticoagulante terapeutico.", F13D);
+    h += t;
+    h += rr("si", "", "", "L'anticoagulante prosegue fino alla fine della valutazione, anche con un fattore scatenante transitorio (" + AHA + ", 1 B-NR, p. e1026 n. 5). <b>Non si sospende</b>, salvo un alto rischio emorragico, che è l'eccezione di quella riga.");
+    h += sot("Con che cosa · centro CTEPH o IP");
+    h += rr("si", "I", "C", "Scintigrafia V/Q, se manca: resta l'esame più efficace per escludere la CTEPD" + pgs(P95) + ".", R2);
+    h += rr("si", "I", "C", "<b>Angio-TC polmonare</b>: da sola, anche se di alta qualità e negativa, non esclude la CTEPD" + pgs(P95) + ".", R2);
+    h += rr("si", "IIa", "C", "<b>DSA</b>, se l'angio-TC non è conclusiva" + pgs(F13) + ".", R2);
+    h += rr("si", "I", "B", "<b>Cateterismo destro</b>, per confermare l'IP.", R1);
+    h += sot("Che cosa dicono i dati scritti fin qui");
+    if (p.stato === "ok" && s.perf && s.trombo && p.cod === "pre") h += nota("ok", "Difetti non concordanti, trombo cronico e <b>IP pre-capillare</b>: i tre pezzi della <b>CTEPH</b>" + pgs(P94 + "; " + T5) + ". Se sono dopo i 3 mesi, scegli «CTEPH confermata» al passo 1: il team valuta la terapia " + corPill("I") + pgs(F13) + ".");
+    else if (p.stato === "ok" && s.perf && s.trombo && p.cod === "noip") h += nota("ok", "Difetti non concordanti, trombo cronico e <b>nessuna IP a riposo</b>: con i sintomi, una <b>CTEPD senza IP</b>" + pgs(P94 + "; " + T5) + ". Scegli quella al passo 1.");
+    else if (p.stato === "ok" && (p.cod === "ipc" || p.cod === "cpc" || p.cod === "post")) h += nota("", "<b>" + p.nome + "</b>, con PAWP &gt;15 mmHg: la Tab. 14 ammette «pre- (o post-) capillare» nel gruppo 4" + pgs(T14) + ", ma la componente sinistra va chiarita prima. Tool Gruppi 2 e 3, Tool Cateterismo IP.");
+    else h += nota("spenta", "— La diagnosi chiede tre pezzi: difetti non concordanti, segni di trombo cronico, e il cateterismo con la Tab. 5" + pgs(P94 + "; " + T5) + ". Lo strumento li mette insieme quando ci sono tutti.");
+    h += nota("spenta", "Se il trombo non convince: sarcoma dell'arteria polmonare, altri tumori, arterite senza connettivite, stenosi congenite o acquisite, parassiti, emboli di corpi estranei" + pgs(P95) + ".");
+    return h;
+  }
+
+  function disegna() {
+    var s = S(), p = profilo(s.mpap, s.pawp, s.pvr), c = contraddizioni(s, p), i, h, ps;
+    var chk = document.querySelectorAll(".chk");
+    for (i = 0; i < chk.length; i++) {
+      var inp = chk[i].querySelector("input"), on = !!(inp && inp.checked);
+      if (on && (" " + chk[i].className + " ").indexOf(" on ") < 0) chk[i].className += " on";
+      if (!on) chk[i].className = chk[i].className.replace(/(^|\s)on(\s|$)/g, " ").replace(/\s+$/, "");
+    }
+    function mostra(id, sn) { var e = el(id); e.className = e.className.replace(/(^|\s)hide(\s|$)/g, " ").replace(/\s+$/, "") + (sn ? "" : " hide"); }
+    mostra("bloccoDac", s.diag === "dac");
+    mostra("stAc", s.diag === "cteph" || s.diag === "ctepd");
+    mostra("bloccoAcCteph", s.diag === "cteph");
+    mostra("bloccoAcCtepd", s.diag === "ctepd");
+    mostra("stInt", s.diag === "cteph");
+    mostra("bloccoOper", s.diag === "cteph" && (s.int === "no" || s.int === "bpa"));
+    mostra("bloccoDopo", s.diag === "cteph" && (s.int === "pea" || s.int === "bpa"));
+    mostra("stPaz", s.diag === "cteph" || s.diag === "ctepd");
+    mostra("rigaWho", s.diag === "cteph");
+    mostra("bloccoFarm", s.diag === "cteph");
+    el("nPaz").innerHTML = s.diag === "ctepd" ? "3" : "4";
+
+    /* accanto ai campi */
+    el("vMpap").innerHTML = s.mpap === null ? "—" : (inScala(s.mpap, "mpap") ? (s.mpap > EMO.mPAP ? "&gt;20" : "≤20") : "fuori scala");
+    el("vPawp").innerHTML = s.pawp === null ? "—" : (inScala(s.pawp, "pawp") ? (s.pawp > EMO.PAWP ? "&gt;15" : "≤15") : "fuori scala");
+    el("vPvr").innerHTML = s.pvr === null ? "—" : (inScala(s.pvr, "pvr") ? (s.pvr > PVR_BPA ? "&gt;4" : (s.pvr > EMO.PVR ? "&gt;2" : "≤2")) : "fuori scala");
+    el("vMesi").innerHTML = s.mesi === null ? "—" : (inScala(s.mesi, "mesi") ? (s.mesi < RHC.da ? "prima dei 3 mesi" : (s.mesi <= RHC.a ? "3–6 mesi" : "oltre i 6 mesi")) : "fuori scala");
+
+    /* il profilo */
+    h = "";
+    if (p.stato === "ok") h += '<div class="esito" style="margin-top:8px">' + chip(p.k, p.nome) + '<span class="muted" style="font-size:12.5px">' + pgs(T5) + (p.cod === "noncl" ? pgs(P37) : "") + "</span></div>";
+    else if (p.stato === "fuori") h += '<div class="esito" style="margin-top:8px">' + chip("kx", "—") + '<span class="muted">fuori scala: ' + p.motivi.join("; ") + "</span></div>";
+    else h += '<div class="esito" style="margin-top:8px">' + chip("kx", "—") + '<span class="muted">per il profilo manca ' + p.manca + "</span></div>";
+    for (i = 0; i < c.length; i++) h += nota("stop", "<b>Dati in contraddizione.</b> " + c[i]);
+    var av = avvisiEmo(s, p);
+    for (i = 0; i < av.length; i++) h += nota("", av[i]);
+    if (s.diag === "cteph" && s.esito === "ok" && (s.int === "pea" || s.int === "bpa") && s.mpap !== null && inScala(s.mpap, "mpap") && s.mpap > EMO.mPAP) h += nota("", "Hai segnato «nessuna IP» al controllo, ma con mPAP " + vir(s.mpap) + " mmHg c'è IP a riposo" + pgs(T5) + ". Se sono i numeri di prima dell'intervento, scrivi quelli del controllo; se sono quelli del controllo, l'esito è «persistente o recidivante».");
+    el("outEmo").innerHTML = h;
+
+    /* il piano */
+    h = "<h3>Le righe, con la loro classe</h3>";
+    if (!s.diag) h += '<div class="esito">' + chip("kx", "—") + '<span class="muted">manca da dove si parte (passo 1)</span></div>';
+    else if (c.length) {
+      h += '<div class="esito">' + chip("k4", "—") + '<span class="muted">il percorso si ferma finché i dati non tornano: vedi il passo 1</span></div>';
+      h += rr("si", "", "", "Intanto l'anticoagulante <b>non si sospende</b>: a vita nella CTEPH" + pgs(R24A) + ", e fino alla fine della valutazione se la diagnosi è ancora aperta (" + AHA + ", 1 B-NR, p. e1026 n. 5).");
+      if (s.diag === "cteph" && s.aps === "pos" && s.oac === "noac") h += rr("stop", "I", "C", "<b>Con la sindrome da antifosfolipidi: AVK.</b> <b>Oggi prende un NOAC: non è l'anticoagulante della riga.</b>", R24A);
+    }
+    else if (s.diag === "dac") h += pianoDac(s, p);
+    else if (s.diag === "ctepd") h += pianoCtepd(s);
+    else h += pianoCteph(s);
+    if (s.rio && s.pde5) h += rr("stop", "III", "B", "<b>Riociguat con un inibitore della PDE5: non si combinano</b>, ipotensione sistemica" + pgs(P67) + ".", R10);
+    if ((s.rio || s.pde5) && s.nitr) h += rr("stop", "", "", "<b>" + (s.rio && s.pde5 ? "Riociguat e PDE5i" : (s.rio ? "Riociguat" : "PDE5i")) + " con nitrati o donatori di ossido nitrico: non si combinano</b>, ipotensione sistemica.", P67);
+    if (!s.rio && s.pde5 && s.diag === "cteph") h += nota("", "Se si passa al <b>riociguat</b>, il PDE5i va sospeso prima: i tempi nel <b>Tool Farmaci PAH</b>.");
+    el("outPiano").innerHTML = h;
+
+    /* Fig. 15 */
+    mostra("stLiv", s.diag === "cteph" && !c.length);
+    h = "<h3>Che trattamento copre ogni livello — Fig. 15, p. 3697</h3>";
+    h += '<table class="tab"><tr><th>Liv.</th><th>Lesioni</th><th>Vasi</th><th>Fascia</th></tr>';
+    for (i = 0; i < LIV.length; i++) h += "<tr" + (s.liv[LIV[i].id] ? ' class="on"' : "") + "><td>" + LIV[i].id + "</td><td>" + LIV[i].les + "</td><td>" + LIV[i].diam.replace("<", "&lt;") + "</td><td>" + LIV[i].fascia + "</td></tr>";
+    h += "</table>";
+    h += '<div class="muted" style="font-size:12px;margin-top:4px">Le fasce si accavallano: in B e in D la scelta non è automatica, e la decide il centro. Non è un calcolo dell\'operabilità' + pgs(F15) + ".</div>";
+    el("outLiv").innerHTML = h;
+
+    /* da sapere */
+    function inc(tocca, x) { return nota(tocca ? "" : "spenta", (tocca ? "<b>Tocca questo caso.</b> " : "") + x); }
+    var r = ramo(s), ctok = !c.length;
+    h = "";
+    h += inc(ctok && (r === "inop" || r === "pers"), "<b>Farmaci prima della BPA: figura e tabella.</b> Nella Fig. 14 sono il percorso continuo, in un riquadro di Classe I, e la nota d li lega a una PVR &gt;4 WU, come il testo" + pgs(F14D + "; " + P96) + ". La Rec. Table 24B li dà IIa B, GRADE condizionale con qualità molto bassa, senza soglia" + pgs(R24B) + ". Le classi restano come sono: la tabella dà la forza, la figura il percorso.");
+    h += inc(ctok && (r === "inop" || r === "pers"), "<b>«Terapia medica, Classe I» nella Fig. 14</b> è il solo riociguat" + pgs(F14 + "; " + R24A) + ": treprostinil s.c. e fuori indicazione sono IIb B, le combinazioni IIb C.");
+    h += inc(ctok && r === "pea", "<b>La BPA nell'operabile</b> (IIb C) nella Fig. 14 non c'è: dal «sì» dell'operabilità esce solo la PEA" + pgs(F14 + "; " + R24A) + ".");
+    h += inc(ctok && s.diag === "ctepd", "<b>CTEPD senza IP, «raccomandata» o «da considerare».</b> La riga è IIa C, ma il testo e la nota c dicono «raccomandata» nei due sottogruppi, e solo la nota c aggiunge chi non ha una storia di TEV" + pgs(R24A + "; " + P95 + "; " + NC) + ". La classe è quella della riga.");
+    h += inc(s.diag === "cteph" && p.stato === "ok" && (p.cod === "ipc" || p.cod === "cpc" || p.cod === "post"), "<b>CTEPH e PAWP.</b> La Tab. 14 dà al gruppo 4 un'IP pre- (o post-) capillare" + pgs(T14) + "; il § 10 rimanda alla Tab. 5 senza scegliere" + pgs(P94) + ". Quasi tutti gli studi sui farmaci della PAH hanno usato PAWP ≤15" + pgs(P37) + "; per la CTEPH la fonte non lo dice, e non dice che cosa cambi con una PAWP alta.");
+    h += inc(s.diag === "dac", "<b>La prima metà della Fig. 13</b>, dall'eco e dalla scintigrafia ai test da sforzo, è del <b>Tool EP CTEPD</b>, con le sue incoerenze: la perfusione normale finisce nel ramo «no» contro il testo" + pgs(F13 + "; " + P95) + ", i test da sforzo normali non hanno un'uscita, e i difetti non concordanti con eco a bassa probabilità passano dai test da sforzo mentre la riga dell'invio non chiede un'eco positiva" + pgs(R3) + ".");
+    h += inc(s.oac === "noac" || s.diag === "dac", "<b>CONFRONTO · AHA/ACC 2026, embolia polmonare.</b> Più recente sulla CTEPD dopo l'EP, ma si ferma alla diagnosi. CTEPH in circa il 3% dopo un'EP acuta; la definizione non chiede i segni di trombo cronico" + pgs("p. e1026") + ". Valutazione raccomandata nel sintomatico dopo ≥3 mesi (1 B-NR); eco e perfusione insieme (2a B-NR); CPET per escludere la CTEPD (2a B-NR); invio al centro con IP 1 C-LD, senza IP in casi selezionati 2a C-LD; anticoagulante fino alla fine della valutazione (1 B-NR)" + pgs("pp. e1025–e1029") + ". Sulla CTEPD accertata non dice altro: le classi sono nel suo sistema, e qui non si mescolano.");
+    h += inc(false, "<b>CONFRONTO · ESC 2019, embolia polmonare</b> (il Tool EP nella sua modalità): più vecchia, e sulla CTEPH vale la 2022. La 2019 chiedeva PAP media ≥25 mmHg con PAWP ≤15, la 2022 la Tab. 5; a vita con AVK e «nessun dato» sui NOAC, la 2022 a vita senza nominare il farmaco, con l'AVK in riga solo con la sindrome da antifosfolipidi" + pgs(R24A + "; " + P95) + "; controllo a 6–12 mesi dalla PEA, la 2022 a 3–6 mesi" + pgs(P98) + ".");
+    h += inc(ctok && (r === "inop" || r === "pers"), "<b>Dopo il 2022, senza cambiare la classe IIb B.</b> SELECT (selexipag, 128 pazienti): PVR a 20 settimane invariata, rapporto 0,95 (IC 95% 0,84–1,07), fermato per futilità (Kim 2024, PMID 39326918). MACiTEPH (macitentan a una dose più alta di quella della PAH, 127 pazienti): test del cammino −16,1 m contro placebo, fermato per futilità; non vale automaticamente per la dose standard (Jenkins 2025, PMID 41297734). Tutti e due comprendevano anche l'IP persistente o recidivante dopo la PEA.");
+    h += inc(ctok && s.oac === "noac", "<b>Dopo il 2022, gli anticoagulanti.</b> Metanalisi di 12 studi, 10 osservazionali, 4071 pazienti: recidiva con i NOAC RR 0,99 (IC 95% 0,40–2,43), sanguinamenti RR 0,77 (0,45–1,32). Attenua il segnale delle casistiche della linea guida; non tocca la sindrome da antifosfolipidi e non cambia le righe (Catalani 2026, PMID 41559250).");
+    h += inc(ctok && s.int === "bpa" && s.esito === "ok", "<b>Dopo il 2022, riociguat dopo una BPA riuscita.</b> In 74 pazienti di quattro centri giapponesi con emodinamica normalizzata, sospenderlo ha ridotto l'indice cardiaco di picco a 16 settimane (differenza 1,09 L/min/m²; IC 95% 0,20–1,97): esito fisiologico, studi lunghi da fare, la linea guida non affronta la domanda (Shimokawahara 2025, PMID 40714010).");
+    h += inc(false, "<b>Fig. 15, i diametri.</b> Per il livello A la didascalia dà 10–40 mm nel pannello in alto e 0,2–3 cm in quello in basso" + pgs(F15) + ". Qui c'è il primo.");
+    el("outInc").innerHTML = h;
+
+    /* limiti */
+    var lim = [];
+    lim.push("<b>L'operabilità la decide il team CTEPH</b>" + pgs(R24A + "; " + P95) + ": lo strumento la riceve, e la Fig. 15 non è un calcolo. La valutazione può cambiare con l'esperienza del centro in PEA e BPA" + pgs("Fig. 14, nota c, p. 3696") + ". Centri: PEA &gt;50 l'anno, BPA &gt;30 pazienti o &gt;100 procedure l'anno, numeri adattabili al paese" + pgs(P98) + ".");
+    lim.push("<b>Nessuna dose.</b> Anticoagulante: Tool EP durata e prontuario del capitolo 01. Riociguat e treprostinil, con rene, fegato e interazioni: Tool Farmaci PAH. La fonte non dà dosi proprie per la CTEPH" + pgs("Tab. 19, p. 3664") + ".");
+    lim.push("<b>Letture dello strumento.</b> Una mPAP normale dopo un intervento è un risultato, non una contraddizione; senza intervento lo è, e il percorso si ferma. Una PAWP &gt;15 non ferma il percorso, per la Tab. 14: lo strumento avvisa; con PVR ≤2 WU, o con la PVR vuota, le righe di terapia della Rec. Table 24 non stanno in evidenza, perché non nominano questo profilo, e si rivedono col team; l'anticoagulante a vita, il team e il follow-up restano. La PVR si prende dal cateterismo più recente: a PVR 4 WU esatti la soglia «&gt;4» non è superata. Con le sole lesioni A o E la riga I B della BPA è spenta: è la nostra lettura di «ostruzioni distali adatte» sulla Fig. 15. I limiti di scala dei campi sono nostri.");
+    lim.push("Le misure generali della PAH valgono anche qui, compreso l'allenamento supervisionato" + pgs(P95) + ". Il percorso è dell'adulto: nel bambino la fonte non ha questa strada.");
+    el("limiti").innerHTML = "<li>" + lim.join("</li><li>") + "</li>";
+
+    /* barra */
+    function bar(id, k, x) { var b = el(id); b.className = "cat " + k; b.innerHTML = x; }
+    var q = !s.diag ? ["kx", "—"] : (s.diag === "dac" ? ["k2", "da completare"] : (s.diag === "cteph" ? ["k1", "CTEPH"] : ["k1", "CTEPD senza IP"]));
+    bar("barQuadro", q[0], q[1]);
+    ps = passoCorrente(s, c); bar("barPasso", ps.k, ps.t);
+    var cr = cateterismo(s), crf = s.esito === "pers" || s.esito === "ok";
+    bar("barRhc", (cr.stato === "ora" || cr.stato === "oltre") && !crf ? "k3" : "kx",
+      cr.stato === "ora" ? (crf ? "fatto" : "ora") : (cr.stato === "oltre" ? (crf ? "fatto" : "in ritardo") : (cr.stato === "presto" ? "a 3–6 mesi" : "—")));
+  }
+
+  document.addEventListener("input", disegna);
+  document.addEventListener("change", disegna);
+  el("azzera").addEventListener("click", function () {
+    var ins = document.querySelectorAll("input"), i;
+    for (i = 0; i < ins.length; i++) {
+      if (ins[i].type === "checkbox" || ins[i].type === "radio") ins[i].checked = false;
+      else ins[i].value = "";
+    }
+    disegna();
+    window.scrollTo(0, 0);
+  });
+
+  window.CTEPH_MOTORE = { EMO:EMO, PVR_BPA:PVR_BPA, RHC:RHC, POST:POST, LIV:LIV, profilo:profilo, ramo:ramo, cateterismo:cateterismo, bpaDaLesioni:bpaDaLesioni, farmaciPrimaBpa:farmaciPrimaBpa };
+  disegna();
+})();
+
+</script>
+<script data-iphone="web">
+// Solo da un indirizzo https, cioe' dalla pagina pubblicata: aperto come file
+// il tool non cerca ne' manifest ne' service worker, che accanto al file non
+// ci sono. Un errore qui non deve fermare niente: e' un di piu'.
+(function(){
+if(location.protocol!=="https:") return;
+try{
+  var t=document.getElementsByTagName("head")[0];
+  var m=document.createElement("link"); m.rel="manifest"; m.href="manifest.webmanifest";
+  var i=document.createElement("link"); i.rel="apple-touch-icon"; i.href="icona-180.png";
+  t.appendChild(m); t.appendChild(i);
+  if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js")["catch"](function(){});
+}catch(e){}
+})();
+</script>
+<script data-iphone="fine">document.documentElement.className+=" motore-ok";</script>
+</body>
+</html>
